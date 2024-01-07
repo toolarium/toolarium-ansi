@@ -43,12 +43,13 @@ String myAnsiString = AnsiString.getInstance(AnsiColor.AUTO).appendWithColor(tex
 
 #### Create an ansi colored encoded string by the builder:
 ```java
-String myAnsiString = AnsiStringBuilder builder = new AnsiStringBuilder()
-                                                                .setAnsiColor(AnsiColor.AUTO) // is optional
-                                                                .color(ForegroundColor.CYAN)
-                                                                .append("my text")
-                                                                .reset()
-                                                                .toString();
+String myAnsiString = AnsiStringBuilder builder = 
+    new AnsiStringBuilder()
+        .setAnsiColor(AnsiColor.AUTO) // is optional
+        .color(ForegroundColor.CYAN)
+        .append("my text")
+        .reset()
+        .toString();
 ```
 
 #### Sample how to use the AnsiStringBuilder:
