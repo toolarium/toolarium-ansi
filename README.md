@@ -53,21 +53,23 @@ String myAnsiString = AnsiStringBuilder builder = new AnsiStringBuilder()
 
 #### Sample how to use the AnsiStringBuilder:
 ```java
-        // All formatting functions support at least three different overloads, each intended for a different use case.
-        AnsiStringBuilder a = new AnsiStringBuilder()
-                .italic() // Use case 1: Manual Reset
-                .append("This is italicized and reset manually.")
-                .resetItalic(System.lineSeparator()) // You can optionaly supply an additional append string to any of the reset functions that will be appended after the formating reset has been applied.
+// All formatting functions support at least three different overloads, each intended for a different use case.
+AnsiStringBuilder a = new AnsiStringBuilder()
+    .italic() // Use case 1: Manual Reset
+    .append("This is italicized and reset manually.")
+    .resetItalic(System.lineSeparator()) // You can optionaly supply an additional append string to any of the reset functions that will be appended after the formating reset has been applied.
                 
-                .dim("This is dimmed and reset automatically.") // Use case 2: Automatic Reset
-                .append(System.lineSeparator())
+    .dim("This is dimmed and reset automatically.") // Use case 2: Automatic Reset
+    .append(System.lineSeparator())
         
-                .underline(sb -> { // Use case 3: Function Consumer 
-                    sb.color24("#00ff00", "This is both underlined and green");
-                }) // The string builder passed to this function consumer will automatically wrap all content appended to it with the underline formatting.
-                .append(System.lineSeparator())
+    .underline(sb -> { // Use case 3: Function Consumer 
+       sb.color24("#00ff00", "This is both underlined and green");
+    }) // The string builder passed to this function consumer will automatically wrap all content appended to it with the underline formatting.
+    .append(System.lineSeparator())
                 
-                .color(ForegroundColor.CYAN).append("This is in cyan color")
-                
-                .reset();
+    .color(ForegroundColor.CYAN).append("This is in cyan color")
+               
+    .reset();
+    
+LOG.debug("=>" + a.toString());
 ```
