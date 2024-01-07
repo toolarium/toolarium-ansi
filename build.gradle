@@ -2,7 +2,6 @@
  * build.gradle
  *
  * Copyright by toolarium-ansi, all rights reserved.
- * MIT License: https://mit-license.org
  */
 apply from: "https://raw.githubusercontent.com/toolarium/common-gradle-build/master/gradle/common.gradle"
 
@@ -12,10 +11,6 @@ apply from: "https://raw.githubusercontent.com/toolarium/common-gradle-build/mas
  ****************************************************************************************/
 dependencies {
     // see https://docs.gradle.org/current/userguide/java_library_plugin.html
-
-    // utilities
-    //implementation "net.sf.jptools:jptools:${commonGradleJptoolsVersion}"
-    //implementation "net.sf.jptools:jptools:${commonGradleJptoolsVersion}:slf4j-redirect"
 
     // logging
     implementation "org.slf4j:slf4j-api:${commonGradleSlf4jApiVersion}"
