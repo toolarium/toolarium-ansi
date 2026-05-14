@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  * @author patrick
  */
 public final class TerminalUtil {
-    private transient Boolean tty;
+    private volatile Boolean tty;
 
     
     /**
@@ -23,7 +23,7 @@ public final class TerminalUtil {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final TerminalUtil INSTANCE = new TerminalUtil();
     }
 

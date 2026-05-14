@@ -8,10 +8,13 @@ package com.github.toolarium.ansi.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 
@@ -21,12 +24,31 @@ import java.util.concurrent.TimeUnit;
  * @author patrick
  */
 public final class OSUtil {
-    private static final String DEFAULT_CIPHER_NAME = "AESa";
+    private static final String DEFAULT_CIPHER_NAME = "AES";
     private static final int UNLIMITED_JURISDICTION_KEY_SIZE = 1024;
+    private static final Method SLF4J_GET_LOGGER;
+    private static final Method SLF4J_DEBUG;
+    private static final Map<Class<?>, Object> LOGGER_CACHE = new ConcurrentHashMap<>();
+
+    static {
+        Method getLogger = null;
+        Method debugMethod = null;
+        try {
+            Class<?> factory = Class.forName("org.slf4j.LoggerFactory");
+            getLogger = factory.getMethod("getLogger", Class.class);
+            Object logger = getLogger.invoke(null, OSUtil.class);
+            debugMethod = logger.getClass().getMethod("debug", String.class);
+        } catch (Exception | NoClassDefFoundError e) {
+            // slf4j not on classpath, debug logging disabled
+        }
+        SLF4J_GET_LOGGER = getLogger;
+        SLF4J_DEBUG = debugMethod;
+    }
+
     private OSType osType;
     private String osArchitecture;
-    private Boolean isWindowsWsl;
-    private Boolean isUnlimitedJurisdiction;
+    private volatile Boolean isWindowsWsl;
+    private volatile Boolean isUnlimitedJurisdiction;
 
 
     /**
@@ -34,7 +56,7 @@ public final class OSUtil {
      *
      * @author patrick
      */
-    private static class HOLDER {
+    private static final class HOLDER {
         static final OSUtil INSTANCE = new OSUtil();
     }
 
@@ -299,5 +321,32 @@ public final class OSUtil {
 
         isUnlimitedJurisdiction = Boolean.FALSE;
         return isUnlimitedJurisdiction;
+    }
+
+
+    /**
+     * Log a debug message if slf4j is on the classpath. This allows optional debug logging
+     * without requiring slf4j as a runtime dependency.
+     *
+     * @param callerClass the calling class (used as logger name)
+     * @param msg the message
+     */
+    public static void debug(Class<?> callerClass, String msg) {
+        if (SLF4J_GET_LOGGER != null && SLF4J_DEBUG != null) {
+            try {
+                Object logger = LOGGER_CACHE.computeIfAbsent(callerClass, c -> {
+                    try {
+                        return SLF4J_GET_LOGGER.invoke(null, c);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                });
+                if (logger != null) {
+                    SLF4J_DEBUG.invoke(logger, msg);
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+        }
     }
 }

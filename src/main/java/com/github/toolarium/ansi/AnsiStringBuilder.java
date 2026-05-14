@@ -8,6 +8,7 @@ package com.github.toolarium.ansi;
 import com.github.toolarium.ansi.color.BackgroundColor;
 import com.github.toolarium.ansi.color.ColorReset;
 import com.github.toolarium.ansi.color.ForegroundColor;
+import java.util.regex.Pattern;
 
 /**
  * A string builder with built-in support for ANSI escape sequences.
@@ -16,6 +17,25 @@ import com.github.toolarium.ansi.color.ForegroundColor;
  * @author Nathan Fiscaletti
  */
 public class AnsiStringBuilder {
+    private static final String SGR_RESET = "0";
+    private static final String SGR_BOLD = "1";
+    private static final String SGR_DIM = "2";
+    private static final String SGR_ITALIC = "3";
+    private static final String SGR_UNDERLINE = "4";
+    private static final String SGR_BLINK = "5";
+    private static final String SGR_INVERT = "7";
+    private static final String SGR_HIDE = "8";
+    private static final String SGR_STRIKETHROUGH = "9";
+    private static final String SGR_RESET_BOLD_DIM = "22";
+    private static final String SGR_RESET_ITALIC = "23";
+    private static final String SGR_RESET_UNDERLINE = "24";
+    private static final String SGR_RESET_BLINK = "25";
+    private static final String SGR_RESET_INVERT = "27";
+    private static final String SGR_RESET_HIDE = "28";
+    private static final String SGR_RESET_STRIKETHROUGH = "29";
+    private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("^#[A-Fa-f0-9]{6}$");
+    private static final Pattern ANSI_STRIP_PATTERN = Pattern.compile("\u001B\\[[;\\d]*[ -/]*[@-~]");
+
     private java.lang.StringBuilder internal;
     private AnsiColor ansiColor = AnsiColor.AUTO;
 
@@ -65,7 +85,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetHidden() {
-        return this.ansi(Integer.toString(28));
+        return this.ansi(SGR_RESET_HIDE);
     }
 
     
@@ -89,7 +109,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetInvertColors() {
-        return this.ansi(Integer.toString(27));
+        return this.ansi(SGR_RESET_INVERT);
     }
 
     
@@ -113,7 +133,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetBlink() {
-        return this.ansi(Integer.toString(25));
+        return this.ansi(SGR_RESET_BLINK);
     }
 
     
@@ -137,7 +157,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetUnderline() {
-        return this.ansi(Integer.toString(24));
+        return this.ansi(SGR_RESET_UNDERLINE);
     }
 
     
@@ -161,7 +181,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetStrikeThrough() {
-        return this.ansi(Integer.toString(29));
+        return this.ansi(SGR_RESET_STRIKETHROUGH);
     }
 
     
@@ -185,7 +205,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetDim() {
-        return this.ansi(Integer.toString(22));
+        return this.ansi(SGR_RESET_BOLD_DIM);
     }
 
     
@@ -209,7 +229,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetBold() {
-        return this.ansi(Integer.toString(22));
+        return this.ansi(SGR_RESET_BOLD_DIM);
     }
 
     
@@ -233,7 +253,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder resetItalic() {
-        return this.ansi(Integer.toString(23));
+        return this.ansi(SGR_RESET_ITALIC);
     }
 
     
@@ -257,7 +277,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder reset() {
-        return this.ansi(Integer.toString(0));
+        return this.ansi(SGR_RESET);
     }
 
     
@@ -281,7 +301,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder hide() {
-        return this.ansi(Integer.toString(8));
+        return this.ansi(SGR_HIDE);
     }
 
     
@@ -306,7 +326,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder strikeThrough() {
-        return this.ansi(Integer.toString(9));
+        return this.ansi(SGR_STRIKETHROUGH);
     }
 
     
@@ -345,7 +365,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder invertColor() {
-        return this.ansi(Integer.toString(7));
+        return this.ansi(SGR_INVERT);
     }
 
     
@@ -359,6 +379,7 @@ public class AnsiStringBuilder {
     public <T> AnsiStringBuilder invertColor(T value) {
         this.invertColor();
         this.append(value);
+        this.resetInvertColors();
         return this;
     }
 
@@ -383,7 +404,7 @@ public class AnsiStringBuilder {
      * @return AnsiStringBuilder
      */
     public AnsiStringBuilder blink() {
-        return this.ansi(Integer.toString(5));
+        return this.ansi(SGR_BLINK);
     }
 
     
@@ -422,7 +443,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder underline() {
-        return this.ansi(Integer.toString(4));
+        return this.ansi(SGR_UNDERLINE);
     }
 
     
@@ -461,7 +482,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder dim() {
-        return this.ansi(Integer.toString(2));
+        return this.ansi(SGR_DIM);
     }
 
     
@@ -500,7 +521,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder bold() {
-        return this.ansi(Integer.toString(1));
+        return this.ansi(SGR_BOLD);
     }
 
     
@@ -539,7 +560,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder italic() {
-        return this.ansi(Integer.toString(3));
+        return this.ansi(SGR_ITALIC);
     }
 
     
@@ -856,13 +877,13 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color24(String hexColor) throws IllegalArgumentException {
-        if (!hexColor.matches("^\\#[A-Fa-f0-9]{6}$")) {
+        if (!HEX_COLOR_PATTERN.matcher(hexColor).matches()) {
             throw new IllegalArgumentException("Invalid 24-bit hexadecimal color value.");
         }
 
-        Integer r = Integer.valueOf(hexColor.substring(1, 3), 16);
-        Integer g = Integer.valueOf(hexColor.substring(3, 5), 16);
-        Integer b = Integer.valueOf(hexColor.substring(5, 7), 16);
+        int r = Integer.parseInt(hexColor.substring(1, 3), 16);
+        int g = Integer.parseInt(hexColor.substring(3, 5), 16);
+        int b = Integer.parseInt(hexColor.substring(5, 7), 16);
         return this.color24(r, g, b);
     }
 
@@ -963,13 +984,13 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor24(String hexColor) throws IllegalArgumentException {
-        if (!hexColor.matches("^\\#[A-Fa-f0-9]{6}$")) {
+        if (!HEX_COLOR_PATTERN.matcher(hexColor).matches()) {
             throw new IllegalArgumentException("Invalid 24-bit hexadecimal color value.");
         }
 
-        Integer r = Integer.valueOf(hexColor.substring(1, 3), 16);
-        Integer g = Integer.valueOf(hexColor.substring(3, 5), 16);
-        Integer b = Integer.valueOf(hexColor.substring(5, 7), 16);
+        int r = Integer.parseInt(hexColor.substring(1, 3), 16);
+        int g = Integer.parseInt(hexColor.substring(3, 5), 16);
+        int b = Integer.parseInt(hexColor.substring(5, 7), 16);
         return backgroundColor24(r, g, b);
     }
 
@@ -1113,13 +1134,15 @@ public class AnsiStringBuilder {
      * @return the String
      */
     public String toString(boolean reset, boolean strip) {
+        String result;
         if (reset) {
-            this.reset();
+            result = this.internal.toString() + ansiColor.ansify(SGR_RESET);
+        } else {
+            result = this.internal.toString();
         }
 
-        String result = this.internal.toString();
         if (strip) {
-            result = result.replaceAll("\u001B\\[[;\\d]*[ -/]*[@-~]", "");
+            result = ANSI_STRIP_PATTERN.matcher(result).replaceAll("");
         }
 
         return result;

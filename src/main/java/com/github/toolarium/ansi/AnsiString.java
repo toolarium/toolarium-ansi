@@ -100,7 +100,7 @@ public final class AnsiString {
          */
         public String appendWithColor(String text, BackgroundColor backgroundColor) {
             AnsiStringBuilder builder = new AnsiStringBuilder().setAnsiColor(ansiColor);
-            return builder.color(backgroundColor).append(text).reset().toString();
+            return builder.color(backgroundColor).append(text).toString();
         }
 
         
@@ -127,7 +127,7 @@ public final class AnsiString {
          */
         public String appendWithColor(String text, ForegroundColor foregroundColor, BackgroundColor backgroundColor) {
             AnsiStringBuilder builder = new AnsiStringBuilder().setAnsiColor(ansiColor);
-            return builder.color(foregroundColor, backgroundColor).append(text).reset().toString();
+            return builder.color(foregroundColor, backgroundColor).append(text).toString();
         }
 
 

@@ -9,8 +9,6 @@ package com.github.toolarium.ansi;
 import com.github.toolarium.ansi.util.OSUtil;
 import com.github.toolarium.ansi.util.TerminalUtil;
 import java.lang.reflect.Field;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -21,8 +19,8 @@ import org.slf4j.LoggerFactory;
  * <li>ANSI is enabled when system property os.name starts with "Windows" and JAnsi Console is installed.</li>
  * <li>ANSI is disabled when environment variable CLICOLOR == 0.</li>
  * <li>ANSI is disabled when environment variable ConEmuANSI == OFF.</li>
- * <li>ANSI is disabled when it guessed the program’s output stream is not connected to a terminal:</li> 
- *     when System.console() returns null. This check is omitted if guesses the program is running in a Windows Cygwin, MSYS or MSYS2 environment:</li> 
+ * <li>ANSI is disabled when it guessed the program’s output stream is not connected to a terminal:
+ *     when System.console() returns null. This check is omitted if guesses the program is running in a Windows Cygwin, MSYS or MSYS2 environment:
  *     when system property os.name starts with "Windows" and either environment variable TERM contains cygwin or starts with xterm or environment variable OSTYPE is defined.</li>
  * <li>ANSI is enabled when environment variable ANSICON is defined.</li>
  * <li>ANSI is enabled when environment variable CLICOLOR == 1.</li>
@@ -30,6 +28,7 @@ import org.slf4j.LoggerFactory;
  * <li>ANSI is enabled when it detects the program is running in a non-Windows OS (system property os.name does not start with "Windows").</li>
  * <li>ANSI is enabled when it guesses the program is running in a Cygwin, MSYS or MSYS2 environment (either environment variable TERM contains cygwin or starts with xterm or environment variable OSTYPE is defined).</li>
  * </ul>
+ *
  * <p>The implementation is compatipel with the <a href=https://github.com/remkop/picocli>picoli</a></p>
  * 
  * @author patrick
@@ -59,11 +58,10 @@ public enum AnsiColor {
     /** ANSI END ESCAPE SEQUENCE */
     public static final String ANSI_STOP_ESCAPE_SEQUENCE = "m";
     
-    private static final Logger LOG = LoggerFactory.getLogger(AnsiColor.class);
-    private Boolean jansiInstalled;
-    private Boolean autoDetect;
-    private Boolean toolariumTty;
-    private String tooalriumSystemProperty;
+    private volatile Boolean jansiInstalled;
+    private volatile Boolean autoDetect;
+    private volatile Boolean toolariumTty;
+    private volatile String tooalriumSystemProperty;
 
     
     /** 
@@ -87,16 +85,18 @@ public enum AnsiColor {
         
         if (tooalriumSystemProperty == null || !tooalriumSystemProperty.equals(System.getProperty(TOOLARIUM_ANSI))) {
             tooalriumSystemProperty = System.getProperty(TOOLARIUM_ANSI);
-            
+            autoDetect = null;
+            toolariumTty = null;
+
             if (tooalriumSystemProperty != null) {
-                LOG.debug("Toolarim ansi setting: " + tooalriumSystemProperty);
+                OSUtil.debug(AnsiColor.class,"Toolarim ansi setting: " + tooalriumSystemProperty);
             }
         }
         
         if (tooalriumSystemProperty == null || "AUTO".equalsIgnoreCase(tooalriumSystemProperty.trim())) {
             if (autoDetect == null) {
                 autoDetect = doAutodetect();
-                LOG.debug("Ansi auto detection result: " + autoDetect);
+                OSUtil.debug(AnsiColor.class,"Ansi auto detection result: " + autoDetect);
             }
             return autoDetect;
         }
@@ -105,9 +105,9 @@ public enum AnsiColor {
             if ("TTY".equalsIgnoreCase(tooalriumSystemProperty.trim())) {
                 toolariumTty = TerminalUtil.getInstance().isTTY() || TerminalUtil.getInstance().isPseudoTTY();
                 if (toolariumTty) {
-                    LOG.debug("Valid ansi tty setting and is proper tty or psedu tty: " + toolariumTty);
+                    OSUtil.debug(AnsiColor.class,"Valid ansi tty setting and is proper tty or psedu tty: " + toolariumTty);
                 } else {
-                    LOG.debug("Valid ansi tty setting but is not proper tty nor psedu tty: " + toolariumTty);
+                    OSUtil.debug(AnsiColor.class,"Valid ansi tty setting but is not proper tty nor psedu tty: " + toolariumTty);
                 }
             } else {
                 toolariumTty = Boolean.FALSE;
@@ -212,59 +212,59 @@ public enum AnsiColor {
      */
     private boolean doAutodetect() {
         if (isForceDisabled()) {
-            LOG.debug("Force to disable ansi.");
+            OSUtil.debug(AnsiColor.class,"Force to disable ansi.");
             return false;
         }
         
         if (isForceEnabled()) {
-            LOG.debug("Force to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Force to enable ansi.");
             return true;
         }
         
         if (OSUtil.getInstance().isWindows() && isJansiConsoleInstalled()) {
-            LOG.debug("Found jansi support");
+            OSUtil.debug(AnsiColor.class,"Found jansi support");
             return true;
         }
         // #630 JVM crash loading jansi.AnsiConsole on Linux
         if (isHintDisabled()) {
-            LOG.debug("Found hint to disable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found hint to disable ansi.");
             return false;
         }
         
         if (!TerminalUtil.getInstance().isTTY() && !TerminalUtil.getInstance().isPseudoTTY()) {
-            LOG.debug("No tty or pseaudo tty, ansi disabled.");
+            OSUtil.debug(AnsiColor.class,"No tty or pseaudo tty, ansi disabled.");
             return false;
         }
 
         if (isHintEnabled()) {
-            LOG.debug("Found hint to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found hint to enable ansi.");
             return true;
         }
 
         if (!OSUtil.getInstance().isWindows()) {
-            LOG.debug("Found hint to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found hint to enable ansi.");
             return true;
         }
 
         if (TerminalUtil.getInstance().isXterm()) {
-            LOG.debug("Found xterm to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found xterm to enable ansi.");
             return true;
         }
 
         
         if (OSUtil.getInstance().isCygwin()) {
-            LOG.debug("Found cygwein environment to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found cygwein environment to enable ansi.");
             return true;
         }
 
         /*
         if (OSUtil.getInstance().isWSL()) {
-            LOG.debug("Found cygwein environment to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found cygwein environment to enable ansi.");
             return true;
         }*/
         
         if (OSUtil.getInstance().hasOsType()) {
-            LOG.debug("Found OS type to enable ansi.");
+            OSUtil.debug(AnsiColor.class,"Found OS type to enable ansi.");
             return true;
         }
 

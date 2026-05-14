@@ -6,12 +6,21 @@
 apply from: "https://raw.githubusercontent.com/toolarium/common-gradle-build/master/gradle/common.gradle"
 
 
+/***************************************************************************************
+ * define the main class name
+ ***************************************************************************************/
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.github.toolarium.ansi.main.AnsiMain'
+    }
+}
+
+
 /****************************************************************************************
  * Define project dependencies
  ****************************************************************************************/
 dependencies {
-
-    // logging
-    implementation "org.slf4j:slf4j-api:${commonGradleSlf4jApiVersion}"
+    // logging (optional at runtime: debug logging via slf4j if on classpath)
+    testImplementation "org.slf4j:slf4j-api:${commonGradleSlf4jApiVersion}"
     testRuntimeOnly "ch.qos.logback:logback-classic:${commonGradleLogbackVersion}"
 }
