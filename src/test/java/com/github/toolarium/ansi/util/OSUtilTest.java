@@ -161,7 +161,7 @@ public class OSUtilTest {
      */
     @Test
     public void testGetCreationTimestampNonExisting() {
-        Path path = Path.of("non_existing_file_xyz_12345.txt");
+        Path path = new File("non_existing_file_xyz_12345.txt").toPath();
         long timestamp = OSUtil.getInstance().getCreationTimestamp(path);
         assertEquals(-1, timestamp);
     }

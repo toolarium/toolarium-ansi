@@ -36,6 +36,7 @@ public class AnsiStringBuilder {
     private static final String SGR_RESET_INVERT = "27";
     private static final String SGR_RESET_HIDE = "28";
     private static final String SGR_RESET_STRIKETHROUGH = "29";
+    private static final String CONSUMER_PARAM = "consumer";
     private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("^#[A-Fa-f0-9]{6}$");
     private static final Pattern ANSI_STRIP_PATTERN = Pattern.compile("\u001B\\[[;\\d]*[ -/]*[@-~]");
 
@@ -357,7 +358,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder strikeThrough(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.strikeThrough();
         consumer.accept(this);
         this.resetStrikeThrough();
@@ -397,7 +398,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder invertColor(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.invertColor();
         consumer.accept(this);
         this.resetInvertColors();
@@ -437,7 +438,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder blink(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.blink();
         consumer.accept(this);
         this.resetBlink();
@@ -462,7 +463,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder underline(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.underline();
         consumer.accept(this);
         this.resetUnderline();
@@ -517,7 +518,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder dim(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.dim();
         consumer.accept(this);
         this.resetDim();
@@ -557,7 +558,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder bold(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.bold();
         consumer.accept(this);
         this.resetBold();
@@ -599,7 +600,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder italic(java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.italic();
         consumer.accept(this);
         this.resetItalic();
@@ -627,7 +628,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(ForegroundColor color, java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.color(color);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -654,7 +655,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(BackgroundColor color, java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.color(color);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);
@@ -716,7 +717,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(ForegroundColor fg, BackgroundColor bg, java.util.function.Consumer<AnsiStringBuilder> consumer) {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.color(fg);
         this.color(bg);
         consumer.accept(this);
@@ -792,7 +793,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color8(int color, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.color8(color);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -842,7 +843,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor8(int color, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.backgroundColor8(color);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);
@@ -916,7 +917,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color24(int r, int g, int b, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.color24(r, g, b);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -933,7 +934,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color24(String hexColor, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.color24(hexColor);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -1025,7 +1026,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor24(int r, int g, int b, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.backgroundColor24(r, g, b);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);
@@ -1043,7 +1044,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor24(String hexColor, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
-        Objects.requireNonNull(consumer, "consumer");
+        Objects.requireNonNull(consumer, CONSUMER_PARAM);
         this.backgroundColor24(hexColor);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);

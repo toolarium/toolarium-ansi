@@ -215,8 +215,8 @@ public final class OSUtil {
         File file = new File("/proc/version");
         if (file.exists() && file.canRead()) {
             try {
-                String content = Files.readString(file.toPath());
-                isWindowsWsl = (content != null && !content.isBlank() && content.toLowerCase().indexOf("microsoft") >= 0);
+                String content = new String(Files.readAllBytes(file.toPath()));
+                isWindowsWsl = (content != null && content.trim().length() > 0 && content.toLowerCase().indexOf("microsoft") >= 0);
             } catch (Exception e) {
                 isWindowsWsl = Boolean.FALSE;
             }
