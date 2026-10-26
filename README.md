@@ -72,5 +72,7 @@ AnsiStringBuilder a = new AnsiStringBuilder()
                
     .reset();
     
-LOG.debug("=>" + a.toString());
+if (LOG.isDebugEnabled()) {
+    LOG.debug("=>" + a.toString());
+}
 ```

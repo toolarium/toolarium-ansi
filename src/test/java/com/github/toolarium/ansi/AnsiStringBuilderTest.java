@@ -6,6 +6,7 @@
 package com.github.toolarium.ansi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -82,7 +83,9 @@ public class AnsiStringBuilderTest {
 
                 .reset();
 
-        LOG.debug("=>" + a.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("=>" + a.toString());
+        }
     }
 
 
@@ -609,5 +612,208 @@ public class AnsiStringBuilderTest {
         result = new AnsiStringBuilder().setAnsiColor(AnsiColor.ON)
                 .resetColor(ColorReset.ALL).toString(false);
         assertEquals(ESC + SGR_FG_RESET + M + ESC + SGR_BG_RESET + M, result);
+    }
+
+
+    /**
+     * Test hide with consumer
+     */
+    @Test
+    public void testHideConsumer() {
+        // hide(Consumer) is not available; verify hide(T) auto-resets
+        String result = new AnsiStringBuilder().setAnsiColor(AnsiColor.ON)
+                .hide(TEXT).append(SUFFIX).toString(false);
+        assertEquals(ESC + SGR_HIDE + M + TEXT + ESC + SGR_RESET_HIDE + M + SUFFIX, result);
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for all consumer methods
+     */
+    @Test
+    public void testNullConsumerBold() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).bold(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for italic
+     */
+    @Test
+    public void testNullConsumerItalic() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).italic(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for dim
+     */
+    @Test
+    public void testNullConsumerDim() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).dim(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for underline
+     */
+    @Test
+    public void testNullConsumerUnderline() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).underline(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for blink
+     */
+    @Test
+    public void testNullConsumerBlink() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).blink(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for strikeThrough
+     */
+    @Test
+    public void testNullConsumerStrikeThrough() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).strikeThrough(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for invertColor
+     */
+    @Test
+    public void testNullConsumerInvertColor() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).invertColor(
+                        (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for foreground color
+     */
+    @Test
+    public void testNullConsumerForegroundColor() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).color(
+                        ForegroundColor.RED, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for background color
+     */
+    @Test
+    public void testNullConsumerBackgroundColor() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).color(
+                        BackgroundColor.RED, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for combined foreground and background color
+     */
+    @Test
+    public void testNullConsumerFgBgColor() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).color(
+                        ForegroundColor.RED, BackgroundColor.BLUE, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for 8-bit foreground color
+     */
+    @Test
+    public void testNullConsumerColor8() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).color8(
+                        100, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for 8-bit background color
+     */
+    @Test
+    public void testNullConsumerBackgroundColor8() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).backgroundColor8(
+                        100, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for 24-bit RGB foreground color
+     */
+    @Test
+    public void testNullConsumerColor24Rgb() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).color24(
+                        255, 0, 0, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for 24-bit hex foreground color
+     */
+    @Test
+    public void testNullConsumerColor24Hex() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).color24(
+                        "#ff0000", (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for 24-bit RGB background color
+     */
+    @Test
+    public void testNullConsumerBackgroundColor24Rgb() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).backgroundColor24(
+                        255, 0, 0, (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test null consumer throws NullPointerException for 24-bit hex background color
+     */
+    @Test
+    public void testNullConsumerBackgroundColor24Hex() {
+        assertThrows(NullPointerException.class,
+                () -> new AnsiStringBuilder().setAnsiColor(AnsiColor.ON).backgroundColor24(
+                        "#ff0000", (java.util.function.Consumer<AnsiStringBuilder>) null));
+    }
+
+
+    /**
+     * Test toString default calls toString with reset
+     */
+    @Test
+    public void testToStringDefault() {
+        AnsiStringBuilder builder = new AnsiStringBuilder().setAnsiColor(AnsiColor.ON);
+        builder.bold().append(TEXT);
+        String withReset = builder.toString();
+        assertTrue(withReset.endsWith(ESC + SGR_RESET + M));
+
+        String withoutReset = builder.toString(false);
+        assertNotNull(withoutReset);
     }
 }

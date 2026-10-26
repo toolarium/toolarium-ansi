@@ -44,12 +44,12 @@ public enum AnsiColor {
      */
     ON,
     
-    /** 
-     * Forced OFF: always enabled ansi colors regardless of the platform. 
+    /**
+     * Forced OFF: always disabled ansi colors regardless of the platform.
      */
     OFF;
     
-    /** toolarium ansi settimng */
+    /** toolarium ansi setting */
     public static final String TOOLARIUM_ANSI = "toolarium.ansi";
 
     /** ANSI START ESCAPE SEQUENCE */
@@ -61,7 +61,7 @@ public enum AnsiColor {
     private volatile Boolean jansiInstalled;
     private volatile Boolean autoDetect;
     private volatile Boolean toolariumTty;
-    private volatile String tooalriumSystemProperty;
+    private volatile String toolariumSystemProperty;
 
     
     /** 
@@ -78,43 +78,51 @@ public enum AnsiColor {
         if (this == ON) {
             return true;
         }
-        
+
         if (this == OFF) {
             return false;
         }
-        
-        if (tooalriumSystemProperty == null || !tooalriumSystemProperty.equals(System.getProperty(TOOLARIUM_ANSI))) {
-            tooalriumSystemProperty = System.getProperty(TOOLARIUM_ANSI);
-            autoDetect = null;
-            toolariumTty = null;
 
-            if (tooalriumSystemProperty != null) {
-                OSUtil.debug(AnsiColor.class,"Toolarim ansi setting: " + tooalriumSystemProperty);
+        // Use local snapshots of volatile fields to prevent race conditions
+        String currentProp = System.getProperty(TOOLARIUM_ANSI);
+        String cachedProp = this.toolariumSystemProperty;
+
+        if (cachedProp == null || !cachedProp.equals(currentProp)) {
+            this.toolariumSystemProperty = currentProp;
+            this.autoDetect = null;
+            this.toolariumTty = null;
+
+            if (currentProp != null) {
+                OSUtil.getInstance().debug(AnsiColor.class, "Toolarium ansi setting: " + currentProp);
             }
         }
-        
-        if (tooalriumSystemProperty == null || "AUTO".equalsIgnoreCase(tooalriumSystemProperty.trim())) {
-            if (autoDetect == null) {
-                autoDetect = doAutodetect();
-                OSUtil.debug(AnsiColor.class,"Ansi auto detection result: " + autoDetect);
+
+        if (currentProp == null || "AUTO".equalsIgnoreCase(currentProp.trim())) {
+            Boolean detected = this.autoDetect;
+            if (detected == null) {
+                detected = doAutodetect();
+                this.autoDetect = detected;
+                OSUtil.getInstance().debug(AnsiColor.class, "Ansi auto detection result: " + detected);
             }
-            return autoDetect;
+            return detected;
         }
 
-        if (toolariumTty == null && tooalriumSystemProperty != null) {
-            if ("TTY".equalsIgnoreCase(tooalriumSystemProperty.trim())) {
-                toolariumTty = TerminalUtil.getInstance().isTTY() || TerminalUtil.getInstance().isPseudoTTY();
-                if (toolariumTty) {
-                    OSUtil.debug(AnsiColor.class,"Valid ansi tty setting and is proper tty or psedu tty: " + toolariumTty);
+        Boolean ttyResult = this.toolariumTty;
+        if (ttyResult == null) {
+            if ("TTY".equalsIgnoreCase(currentProp.trim())) {
+                ttyResult = TerminalUtil.getInstance().isTTY() || TerminalUtil.getInstance().isPseudoTTY();
+                if (ttyResult) {
+                    OSUtil.getInstance().debug(AnsiColor.class, "Valid ansi tty setting and is proper tty or pseudo tty: " + ttyResult);
                 } else {
-                    OSUtil.debug(AnsiColor.class,"Valid ansi tty setting but is not proper tty nor psedu tty: " + toolariumTty);
+                    OSUtil.getInstance().debug(AnsiColor.class, "Valid ansi tty setting but is not proper tty nor pseudo tty: " + ttyResult);
                 }
             } else {
-                toolariumTty = Boolean.FALSE;
+                ttyResult = Boolean.FALSE;
             }
+            this.toolariumTty = ttyResult;
         }
-        
-        return toolariumTty || ((tooalriumSystemProperty != null) && "true".equalsIgnoreCase(tooalriumSystemProperty.trim()));
+
+        return ttyResult || "true".equalsIgnoreCase(currentProp.trim());
     }
 
     
@@ -134,7 +142,8 @@ public enum AnsiColor {
      * @return true or false
      */
     public boolean isForceEnabled() {
-        return System.getenv("CLICOLOR_FORCE") != null && !"0".equals(System.getenv("CLICOLOR_FORCE"));
+        String cliColorForce = System.getenv("CLICOLOR_FORCE");
+        return cliColorForce != null && !"0".equals(cliColorForce);
     }
 
 
@@ -183,13 +192,13 @@ public enum AnsiColor {
      */
     public String ansify(String value) {
         if (isEnabled()) {
-            return new StringBuilder().append(ANSI_START_ESCAPE_SEQUENCE).append(value).append(ANSI_STOP_ESCAPE_SEQUENCE).toString();
+            return ANSI_START_ESCAPE_SEQUENCE + value + ANSI_STOP_ESCAPE_SEQUENCE;
         } else {
             return "";
         }
     }
 
-    
+
     /**
      * Appends a custom ANSI flag.
      *
@@ -198,7 +207,7 @@ public enum AnsiColor {
      */
     public String ansify(int value) {
         if (isEnabled()) {
-            return new StringBuilder().append(ANSI_START_ESCAPE_SEQUENCE).append(value).append(ANSI_STOP_ESCAPE_SEQUENCE).toString();
+            return ANSI_START_ESCAPE_SEQUENCE + value + ANSI_STOP_ESCAPE_SEQUENCE;
         } else {
             return "";
         }
@@ -212,59 +221,59 @@ public enum AnsiColor {
      */
     private boolean doAutodetect() {
         if (isForceDisabled()) {
-            OSUtil.debug(AnsiColor.class,"Force to disable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Force to disable ansi.");
             return false;
         }
         
         if (isForceEnabled()) {
-            OSUtil.debug(AnsiColor.class,"Force to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Force to enable ansi.");
             return true;
         }
         
         if (OSUtil.getInstance().isWindows() && isJansiConsoleInstalled()) {
-            OSUtil.debug(AnsiColor.class,"Found jansi support");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found jansi support");
             return true;
         }
         // #630 JVM crash loading jansi.AnsiConsole on Linux
         if (isHintDisabled()) {
-            OSUtil.debug(AnsiColor.class,"Found hint to disable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found hint to disable ansi.");
             return false;
         }
         
         if (!TerminalUtil.getInstance().isTTY() && !TerminalUtil.getInstance().isPseudoTTY()) {
-            OSUtil.debug(AnsiColor.class,"No tty or pseaudo tty, ansi disabled.");
+            OSUtil.getInstance().debug(AnsiColor.class,"No tty or pseaudo tty, ansi disabled.");
             return false;
         }
 
         if (isHintEnabled()) {
-            OSUtil.debug(AnsiColor.class,"Found hint to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found hint to enable ansi.");
             return true;
         }
 
         if (!OSUtil.getInstance().isWindows()) {
-            OSUtil.debug(AnsiColor.class,"Found hint to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found hint to enable ansi.");
             return true;
         }
 
         if (TerminalUtil.getInstance().isXterm()) {
-            OSUtil.debug(AnsiColor.class,"Found xterm to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found xterm to enable ansi.");
             return true;
         }
 
         
         if (OSUtil.getInstance().isCygwin()) {
-            OSUtil.debug(AnsiColor.class,"Found cygwein environment to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found cygwein environment to enable ansi.");
             return true;
         }
 
         /*
         if (OSUtil.getInstance().isWSL()) {
-            OSUtil.debug(AnsiColor.class,"Found cygwein environment to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found cygwein environment to enable ansi.");
             return true;
         }*/
         
         if (OSUtil.getInstance().hasOsType()) {
-            OSUtil.debug(AnsiColor.class,"Found OS type to enable ansi.");
+            OSUtil.getInstance().debug(AnsiColor.class,"Found OS type to enable ansi.");
             return true;
         }
 
@@ -286,19 +295,19 @@ public enum AnsiColor {
             if (Boolean.getBoolean("org.fusesource.jansi.Ansi.disable")) {
                 return false;
             }
-            
+
             // the Ansi class internally also checks system property "org.fusesource.jansi.Ansi.disable" but may also have been set with Ansi.setEnabled or a custom detector
             Class<?> ansi = Class.forName("org.fusesource.jansi.Ansi");
             Boolean enabled = (Boolean) ansi.getDeclaredMethod("isEnabled").invoke(null);
             if (!enabled) {
                 return false;
             }
-            
+
             // loading this class will load the native library org.fusesource.jansi.internal.CLibrary
             Class<?> ansiConsole = Class.forName("org.fusesource.jansi.AnsiConsole");
             Field out = ansiConsole.getField("out");
             return out.get(null) == System.out;
-        } catch (Exception reflectionFailed) {
+        } catch (Exception | NoClassDefFoundError reflectionFailed) {
             return false;
         }
     }

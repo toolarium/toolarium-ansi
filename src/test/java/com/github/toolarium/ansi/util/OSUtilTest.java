@@ -187,4 +187,45 @@ public class OSUtilTest {
         // Second call should use cached value
         assertNotNull(Boolean.valueOf(OSUtil.getInstance().isUnlimitedJurisdiction()));
     }
+
+
+    /**
+     * Test debug method does not throw when slf4j is on classpath
+     */
+    @Test
+    public void testDebugWithSlf4j() {
+        // slf4j is on classpath in test scope, should log without error
+        OSUtil.getInstance().debug(OSUtilTest.class, "test debug message");
+    }
+
+
+    /**
+     * Test debug method handles null class gracefully
+     */
+    @Test
+    public void testDebugWithNullClass() {
+        // Should not throw
+        OSUtil.getInstance().debug(null, "test message with null class");
+    }
+
+
+    /**
+     * Test debug method handles null message gracefully
+     */
+    @Test
+    public void testDebugWithNullMessage() {
+        // Should not throw
+        OSUtil.getInstance().debug(OSUtilTest.class, null);
+    }
+
+
+    /**
+     * Test debug is called repeatedly to verify logger caching
+     */
+    @Test
+    public void testDebugLoggerCaching() {
+        OSUtil.getInstance().debug(OSUtilTest.class, "first call");
+        OSUtil.getInstance().debug(OSUtilTest.class, "second call uses cached logger");
+        OSUtil.getInstance().debug(OSUtil.class, "different class logger");
+    }
 }

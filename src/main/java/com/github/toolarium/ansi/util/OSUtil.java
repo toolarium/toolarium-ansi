@@ -26,24 +26,11 @@ import java.util.concurrent.TimeUnit;
 public final class OSUtil {
     private static final String DEFAULT_CIPHER_NAME = "AES";
     private static final int UNLIMITED_JURISDICTION_KEY_SIZE = 1024;
-    private static final Method SLF4J_GET_LOGGER;
-    private static final Method SLF4J_DEBUG;
-    private static final Map<Class<?>, Object> LOGGER_CACHE = new ConcurrentHashMap<>();
 
-    static {
-        Method getLogger = null;
-        Method debugMethod = null;
-        try {
-            Class<?> factory = Class.forName("org.slf4j.LoggerFactory");
-            getLogger = factory.getMethod("getLogger", Class.class);
-            Object logger = getLogger.invoke(null, OSUtil.class);
-            debugMethod = logger.getClass().getMethod("debug", String.class);
-        } catch (Exception | NoClassDefFoundError e) {
-            // slf4j not on classpath, debug logging disabled
-        }
-        SLF4J_GET_LOGGER = getLogger;
-        SLF4J_DEBUG = debugMethod;
-    }
+    private final Method slf4jGetLogger;
+    private final Method slf4jDebug;
+    private final Method slf4jIsDebugEnabled;
+    private final Map<Class<?>, Object> loggerCache = new ConcurrentHashMap<>();
 
     private OSType osType;
     private String osArchitecture;
@@ -65,6 +52,22 @@ public final class OSUtil {
      * Constructor
      */
     private OSUtil() {
+        Method getLogger = null;
+        Method debugMethod = null;
+        Method isDebugEnabled = null;
+        try {
+            Class<?> factory = Class.forName("org.slf4j.LoggerFactory");
+            getLogger = factory.getMethod("getLogger", Class.class);
+            Object logger = getLogger.invoke(null, OSUtil.class);
+            debugMethod = logger.getClass().getMethod("debug", String.class);
+            isDebugEnabled = logger.getClass().getMethod("isDebugEnabled");
+        } catch (Exception | NoClassDefFoundError e) {
+            // slf4j not on classpath, debug logging disabled
+        }
+        this.slf4jGetLogger = getLogger;
+        this.slf4jDebug = debugMethod;
+        this.slf4jIsDebugEnabled = isDebugEnabled;
+
         osType = getOSType();
         osArchitecture = getOSArchitecture();
         isWindowsWsl = null;
@@ -107,7 +110,11 @@ public final class OSUtil {
             return osType;
         }
         
-        final String osName = System.getProperty("os.name").toLowerCase();
+        final String osNameRaw = System.getProperty("os.name");
+        if (osNameRaw == null) {
+            return OSType.UNIX;
+        }
+        final String osName = osNameRaw.toLowerCase();
         if (osName.contains("linux")) {
             return OSType.LINUX;
         } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
@@ -190,7 +197,8 @@ public final class OSUtil {
      * @return true or false
      */
     public boolean isCygwin() {
-        return System.getenv("TERM") != null && System.getenv("TERM").toLowerCase(Locale.ENGLISH).contains("cygwin");
+        String term = System.getenv("TERM");
+        return term != null && term.toLowerCase(Locale.ENGLISH).contains("cygwin");
     }
 
 
@@ -256,10 +264,10 @@ public final class OSUtil {
     
     
     /**
-     * Get the timestamp
+     * Get the creation timestamp of the given path.
      *
      * @param path the path
-     * @return the timestamp
+     * @return the creation timestamp in milliseconds, or {@code -1} if the creation time could not be determined
      */
     public long getCreationTimestamp(Path path) {
         try {
@@ -331,22 +339,25 @@ public final class OSUtil {
      * @param callerClass the calling class (used as logger name)
      * @param msg the message
      */
-    public static void debug(Class<?> callerClass, String msg) {
-        if (SLF4J_GET_LOGGER != null && SLF4J_DEBUG != null) {
-            try {
-                Object logger = LOGGER_CACHE.computeIfAbsent(callerClass, c -> {
-                    try {
-                        return SLF4J_GET_LOGGER.invoke(null, c);
-                    } catch (Exception e) {
-                        return null;
-                    }
-                });
-                if (logger != null) {
-                    SLF4J_DEBUG.invoke(logger, msg);
+    public void debug(Class<?> callerClass, String msg) {
+        if (slf4jGetLogger == null || slf4jDebug == null) {
+            return;
+        }
+
+        try {
+            Object logger = loggerCache.computeIfAbsent(callerClass, c -> {
+                try {
+                    return slf4jGetLogger.invoke(null, c);
+                } catch (Exception e) {
+                    return null;
                 }
-            } catch (Exception e) {
-                // ignore
+            });
+
+            if (logger != null && (slf4jIsDebugEnabled == null || Boolean.TRUE.equals(slf4jIsDebugEnabled.invoke(logger)))) {
+                slf4jDebug.invoke(logger, msg);
             }
+        } catch (Exception e) {
+            // ignore
         }
     }
 }

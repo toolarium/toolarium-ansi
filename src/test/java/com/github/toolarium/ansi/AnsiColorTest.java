@@ -164,4 +164,47 @@ public class AnsiColorTest {
         // Should not throw, checks TTY/pseudo-TTY path
         AnsiColor.AUTO.isEnabled();
     }
+
+
+    /**
+     * Test that changing system property between calls invalidates cache
+     */
+    @Test
+    public void testPropertyChangeInvalidatesCache() {
+        System.setProperty(AnsiColor.TOOLARIUM_ANSI, "true");
+        assertTrue(AnsiColor.AUTO.isEnabled());
+
+        System.setProperty(AnsiColor.TOOLARIUM_ANSI, "false");
+        assertFalse(AnsiColor.AUTO.isEnabled());
+
+        System.setProperty(AnsiColor.TOOLARIUM_ANSI, "true");
+        assertTrue(AnsiColor.AUTO.isEnabled());
+    }
+
+
+    /**
+     * Test property value trimming and case insensitivity
+     */
+    @Test
+    public void testPropertyTrimAndCase() {
+        System.setProperty(AnsiColor.TOOLARIUM_ANSI, "  TRUE  ");
+        assertTrue(AnsiColor.AUTO.isEnabled());
+
+        System.setProperty(AnsiColor.TOOLARIUM_ANSI, "  True  ");
+        assertTrue(AnsiColor.AUTO.isEnabled());
+    }
+
+
+    /**
+     * Test clearing property falls back to auto-detect
+     */
+    @Test
+    public void testClearPropertyFallsBackToAutoDetect() {
+        System.setProperty(AnsiColor.TOOLARIUM_ANSI, "true");
+        assertTrue(AnsiColor.AUTO.isEnabled());
+
+        System.clearProperty(AnsiColor.TOOLARIUM_ANSI);
+        // Should not throw, falls back to auto-detect
+        AnsiColor.AUTO.isEnabled();
+    }
 }

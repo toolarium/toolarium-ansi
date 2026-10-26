@@ -49,4 +49,15 @@ public class BackgroundColorTest {
     public void testEnumCount() {
         assertEquals(17, BackgroundColor.values().length);
     }
+
+
+    /**
+     * Test getValueAsString matches integer value
+     */
+    @Test
+    public void testGetValueAsString() {
+        for (BackgroundColor color : BackgroundColor.values()) {
+            assertEquals(Integer.toString(color.getValue()), color.getValueAsString());
+        }
+    }
 }

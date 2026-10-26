@@ -78,7 +78,8 @@ public final class TerminalUtil {
      * @return true or false
      */
     public boolean isXterm() {
-        return System.getenv("TERM") != null && System.getenv("TERM").startsWith("xterm");
+        String term = System.getenv("TERM");
+        return term != null && term.startsWith("xterm");
     }
 
 

@@ -8,10 +8,13 @@ package com.github.toolarium.ansi;
 import com.github.toolarium.ansi.color.BackgroundColor;
 import com.github.toolarium.ansi.color.ColorReset;
 import com.github.toolarium.ansi.color.ForegroundColor;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
  * A string builder with built-in support for ANSI escape sequences.
+ *
+ * <p>This class is not thread-safe. Each thread should use its own instance.</p>
  *
  * @author patrick
  * @author Nathan Fiscaletti
@@ -201,6 +204,7 @@ public class AnsiStringBuilder {
     
     /**
      * Resets the dim flag.
+     * Note: SGR 22 resets both bold and dim per the ANSI specification.
      *
      * @return the AnsiStringBuilder
      */
@@ -225,6 +229,7 @@ public class AnsiStringBuilder {
     
     /**
      * Resets the bold flag.
+     * Note: SGR 22 resets both bold and dim per the ANSI specification.
      *
      * @return the AnsiStringBuilder
      */
@@ -352,6 +357,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder strikeThrough(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.strikeThrough();
         consumer.accept(this);
         this.resetStrikeThrough();
@@ -391,6 +397,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder invertColor(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.invertColor();
         consumer.accept(this);
         this.resetInvertColors();
@@ -430,6 +437,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder blink(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.blink();
         consumer.accept(this);
         this.resetBlink();
@@ -454,6 +462,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder underline(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.underline();
         consumer.accept(this);
         this.resetUnderline();
@@ -508,6 +517,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder dim(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.dim();
         consumer.accept(this);
         this.resetDim();
@@ -547,6 +557,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder bold(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.bold();
         consumer.accept(this);
         this.resetBold();
@@ -568,7 +579,7 @@ public class AnsiStringBuilder {
      * Appends the string representation of the value with italic formatting.
      *
      * @param <T> the type
-     * @param value the vlaue
+     * @param value the value
      * @return the AnsiStringBuilder
      */
     public <T> AnsiStringBuilder italic(T value) {
@@ -588,6 +599,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder italic(java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.italic();
         consumer.accept(this);
         this.resetItalic();
@@ -602,7 +614,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(ForegroundColor color) {
-        return this.ansi(Integer.toString(color.getValue()));
+        return this.ansi(color.getValueAsString());
     }
 
     
@@ -615,6 +627,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(ForegroundColor color, java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.color(color);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -629,7 +642,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(BackgroundColor color) {
-        return this.ansi(Integer.toString(color.getValue()));
+        return this.ansi(color.getValueAsString());
     }
 
     
@@ -641,6 +654,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(BackgroundColor color, java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.color(color);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);
@@ -702,6 +716,7 @@ public class AnsiStringBuilder {
      * @return the AnsiStringBuilder
      */
     public AnsiStringBuilder color(ForegroundColor fg, BackgroundColor bg, java.util.function.Consumer<AnsiStringBuilder> consumer) {
+        Objects.requireNonNull(consumer, "consumer");
         this.color(fg);
         this.color(bg);
         consumer.accept(this);
@@ -777,6 +792,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color8(int color, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
+        Objects.requireNonNull(consumer, "consumer");
         this.color8(color);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -826,6 +842,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor8(int color, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
+        Objects.requireNonNull(consumer, "consumer");
         this.backgroundColor8(color);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);
@@ -899,6 +916,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color24(int r, int g, int b, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
+        Objects.requireNonNull(consumer, "consumer");
         this.color24(r, g, b);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -915,6 +933,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder color24(String hexColor, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
+        Objects.requireNonNull(consumer, "consumer");
         this.color24(hexColor);
         consumer.accept(this);
         this.resetColor(ColorReset.FG);
@@ -1006,6 +1025,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor24(int r, int g, int b, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
+        Objects.requireNonNull(consumer, "consumer");
         this.backgroundColor24(r, g, b);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);
@@ -1023,6 +1043,7 @@ public class AnsiStringBuilder {
      * @throws IllegalArgumentException In case of an invalid input
      */
     public AnsiStringBuilder backgroundColor24(String hexColor, java.util.function.Consumer<AnsiStringBuilder> consumer) throws IllegalArgumentException {
+        Objects.requireNonNull(consumer, "consumer");
         this.backgroundColor24(hexColor);
         consumer.accept(this);
         this.resetColor(ColorReset.BG);

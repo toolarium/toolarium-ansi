@@ -154,16 +154,19 @@ public class AnsiStringTest {
         String reference = ansiColor.ansify(color.getValue()) + text + ansiColor.ansify("0");
         if (ansiColor.isEnabled()) {
             String toTest = AnsiString.getInstance(ansiColor).appendWithColor(text, color).toString();
-            LOG.debug("To test: " + toTest);
-            LOG.debug("Reference: " + reference);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("To test: " + toTest);
+                LOG.debug("Reference: " + reference);
+            }
             assertEquals(reference, toTest);
         } else {
             String toTest = AnsiString.getInstance(ansiColor).appendWithColor(text, color).toString();
-            LOG.debug("To test: " + toTest);
-            LOG.debug("Reference: " + reference);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("To test: " + toTest);
+                LOG.debug("Reference: " + reference);
+            }
             assertEquals(reference, toTest);
             assertEquals(text, toTest);
-
         }
     }
 }
